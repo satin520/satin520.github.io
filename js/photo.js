@@ -18,8 +18,8 @@ define([], function () {
                 var html, li = "";
                 for (var i = begin; i < end && i < data.length; i++) {
                     li += '<li><div class="img-box">' +
-                        '<a class="img-bg" rel="example_group" href="https://github.com/satin520/satin520.github.io/blob/master/photo/' + data[i] + '?raw=true"></a>' +
-                        '<img lazy-src="https://github.com/satin520/satin520.github.io/blob/master/photo' + data[i] + '?raw=true" />' +
+                        '<a class="img-bg" rel="example_group" href="https://raw.githubusercontent.com/satin520/satin520.github.io/master/photo/' + data[i] + '?raw=true"></a>' +
+                        '<img lazy-src="https://raw.githubusercontent.com/satin520/satin520.github.io/master/photo/' + data[i] + '?raw=true" />' +
                         '</li>';
                 }
 
