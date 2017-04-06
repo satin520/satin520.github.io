@@ -24,10 +24,13 @@ var polaroidGallery = (function () {
     function setGallery(arr) {
         var out = "";
         var i;
+        var caption=[];
+
         for (i = 0; i < arr.length; i++) {
+            caption[i]=arr[i].match(/(\S*)(.jpg|.png|.JPG|.PNG)/)[1];
             out += '<figure id="' + i + '">' +
                 '<img src="https://raw.githubusercontent.com/satin520/satin520.github.io/master/photos/' + arr[i] + '"/>' +
-                '<figcaption>' + arr[i] + '</figcaption>' +
+                '<figcaption>' + caption[i] + '</figcaption>' +
                 '</figure>';
         }
         document.getElementById("gallery").innerHTML = out;
@@ -119,6 +122,7 @@ var polaroidGallery = (function () {
     }
 
     function shuffle(item, zIndex) {
+        var gallery=document.getElementById("gallery");
         var randomX = Math.random();
         var randomY = Math.random();
         var maxR = 45;
@@ -129,8 +133,8 @@ var polaroidGallery = (function () {
         var rotatedW = Math.abs(item.offsetWidth * Math.cos(rotRandomR)) + Math.abs(item.offsetHeight * Math.sin(rotRandomR));
         var rotatedH = Math.abs(item.offsetWidth * Math.sin(rotRandomR)) + Math.abs(item.offsetHeight * Math.cos(rotRandomR));
 
-        var x = Math.floor((window.innerWidth - rotatedW) * randomX);
-        var y = Math.floor((window.innerHeight - rotatedH) * randomY);
+        var x = Math.floor((gallery.offsetWidth - rotatedW) * randomX);
+        var y = Math.floor((gallery.offsetHeight - rotatedH) * randomY);
 
         item.style.transformOrigin = '0 0';
         item.style.WebkitTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(1)';
