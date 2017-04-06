@@ -129,7 +129,7 @@ var polaroidGallery = (function () {
         var rotRandomD = Math.random() * (maxR - minR) + minR;
         var rotRandomR = rotRandomD * Math.PI / 180;
 
-        var rotatedW = Math.abs(item.offsetWidth * Math.cos(rotRandomR)) + Math.abs(item.offsetHeight * Math.sin(rotRandomR));
+        var rotatedW = Math.abs(item.offsetWidth * Math.cos(rotRandomR)) + Math.abs(item.offsetWidth * Math.sin(rotRandomR));
         var rotatedH = Math.abs(item.offsetWidth * Math.sin(rotRandomR)) + Math.abs(item.offsetHeight * Math.cos(rotRandomR));
 
         var x = Math.floor((gallery.offsetWidth - rotatedW) * randomX);
