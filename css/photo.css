@@ -1,14 +1,17 @@
 body {
     background-color: #F2EBE2;
 }
-
+.article-entry{
+    padding:0;
+}
 .fullscreen {
     width: 100%;
     height: 100%;
     overflow: hidden;
     margin: 0;
-    min-height: 500px;
+    min-height: 550px;
     padding: 0;
+    position: relative;
 }
 
 figure {
@@ -60,4 +63,18 @@ button {
 button:hover {
     background-color: #f44336;
     color: white;
+}
+@media screen and (max-width:600px){
+  .fullscreen {
+    min-height: 400px;
+  }
+  .navbar{
+    padding: 5px;
+  }
+  button{
+    padding: 5px 10px;
+  }
+  .article .article-entry{
+    padding: 0;
+  }
 }

@@ -129,12 +129,12 @@ var polaroidGallery = (function () {
         var rotRandomD = Math.random() * (maxR - minR) + minR;
         var rotRandomR = rotRandomD * Math.PI / 180;
 
-        var rotatedW = Math.abs(item.offsetWidth * Math.cos(rotRandomR)) + Math.abs(item.offsetWidth * Math.sin(rotRandomR));
+        var rotatedW = Math.abs(item.offsetWidth * Math.cos(rotRandomR)) + Math.abs(item.offsetHeight * Math.sin(rotRandomR));
         var rotatedH = Math.abs(item.offsetWidth * Math.sin(rotRandomR)) + Math.abs(item.offsetHeight * Math.cos(rotRandomR));
 
         var x = Math.floor((gallery.offsetWidth - rotatedW) * randomX);
         var y = Math.floor((gallery.offsetHeight - rotatedH) * randomY);
-
+        console.log(x)
         item.style.transformOrigin = '0 0';
         item.style.WebkitTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(1)';
         item.style.msTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(1)';
