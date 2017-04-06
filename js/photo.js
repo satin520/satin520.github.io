@@ -100,7 +100,7 @@ var polaroidGallery = (function () {
     }
 
     function select(item) {
-        var scale = 1.8;
+        var scale = 1.6;
         var rotRandomD = 0;
         var gallery=document.getElementById("gallery");
         var initWidth = dataSize[item.id].width;
@@ -111,7 +111,6 @@ var polaroidGallery = (function () {
 
         var x = (gallery.offsetWidth - newWidth) / 2;
         var y = (gallery.offsetHeight - navbarHeight - newHeight) / 2;
-        console.log(gallery.offsetWidth)
         item.style.transformOrigin = '0 0';
         item.style.WebkitTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
         item.style.msTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
