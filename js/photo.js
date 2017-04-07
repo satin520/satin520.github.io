@@ -6,7 +6,7 @@ var polaroidGallery = (function () {
     var resizeTimeout = null;
     var xmlhttp = new XMLHttpRequest();
     var url = "output.json";
-
+    var mode = true;
     function polaroidGallery() {
         observe();
         xmlhttp.onreadystatechange = function () {
@@ -72,6 +72,7 @@ var polaroidGallery = (function () {
                     dataLength++;
 
                     item.addEventListener('click', function () {
+                        mode=true;
                         select(item);
                         shuffleAll();
                     });
@@ -91,10 +92,16 @@ var polaroidGallery = (function () {
                 clearTimeout(resizeTimeout);
             }
             resizeTimeout = setTimeout(function () {
-                shuffleAll();
-                if (currentItem) {
-                    select(currentItem);
+                if(mode){
+                  shuffleAll();
+                  if (currentItem) {
+                      select(currentItem);
+                  }
                 }
+                else{
+                  listmode();
+                }
+
             }, 100);
         });
     }
@@ -113,13 +120,12 @@ var polaroidGallery = (function () {
         var newHeight = initHeight * (newWidth / initWidth);
         var x = (gallery.offsetWidth - newWidth) / 2;
         var y = (gallery.offsetHeight - newHeight) / 2;
-        console.log(y)
         item.style.transformOrigin = '0 0';
         item.style.WebkitTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
         item.style.msTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
         item.style.transform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
         item.style.zIndex = 999;
-
+        var mode = true;
         currentItem = item;
     }
 
@@ -146,6 +152,7 @@ var polaroidGallery = (function () {
         item.style.msTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + minS + ',' + minS + ')';
         item.style.transform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + minS + ',' + minS + ')';
         item.style.zIndex = zIndex;
+
     }
 
     function shuffleAll() {
@@ -155,13 +162,59 @@ var polaroidGallery = (function () {
                 shuffle(dataSize[id].item, zIndex++);
             }
         }
-    }
 
+    }
+    function listmode(){
+      var colSzie=5;
+      var gallery=document.getElementById("gallery");
+      var figure=gallery.getElementsByTagName('figure');
+      var itemW=gallery.offsetWidth/colSzie;
+      var scale=itemW/figure[0].offsetWidth;
+      console.log(scale)
+      var oArr = [];
+      // for (var id in dataSize) {
+      //   dataSize[id].item.style.width=itemW + "px";
+      // }
+      for(var i=0;i<colSzie;i++){
+        dataSize[i].item.style.WebkitTransform = 'translate(' + i*itemW + 'px,' + 0 + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
+        dataSize[i].item.style.msTransform = 'translate(' + i*itemW + 'px,' + 0 + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
+        dataSize[i].item.style.transform = 'translate(' + i*itemW + 'px,' + 0 + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
+        oArr.push(dataSize[i].item.offsetHeight*scale)
+      }
+      for(var i=colSzie;i<figure.length;i++){
+        var x = _getMinKey(oArr);
+        dataSize[i].item.style.WebkitTransform = 'translate(' + x*itemW + 'px,' + oArr[x] + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
+        dataSize[i].item.style.msTransform = 'translate(' + x*itemW + 'px,' + oArr[x] + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
+        dataSize[i].item.style.transform = 'translate(' + x*itemW + 'px,' + oArr[x] + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
+        oArr[x]+=dataSize[i].item.offsetHeight;
+      }
+
+
+
+    }
+    function _getMinKey(arr) {
+      var a = arr[0];
+      var b = 0;
+      for (var k in arr) {
+        if (arr[k] < a) {
+        a = arr[k];
+        b = k;
+        }
+      }
+      return b;
+    }
     function navigation() {
         var next = document.getElementById('next');
         var preview = document.getElementById('preview');
+        var list = document.getElementById('list');
+
+        list.addEventListener('click', function () {
+          mode=false;
+          listmode();
+        });
 
         next.addEventListener('click', function () {
+            mode=true;
             var currentIndex = Number(currentItem.id) + 1;
             if (currentIndex >= dataLength) {
                 currentIndex = 0
@@ -171,6 +224,7 @@ var polaroidGallery = (function () {
         });
 
         preview.addEventListener('click', function () {
+            mode=true;
             var currentIndex = Number(currentItem.id) - 1;
             if (currentIndex < 0) {
                 currentIndex = dataLength - 1
