@@ -77,4 +77,10 @@ button:hover {
   .article .article-entry{
     padding: 0;
   }
+  figure{
+    position: static;
+  }
+  figure img{
+    display: none;
+  }
 }
