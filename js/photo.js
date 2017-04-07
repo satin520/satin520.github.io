@@ -100,17 +100,20 @@ var polaroidGallery = (function () {
     }
 
     function select(item) {
+
         var scale = 1.6;
         var rotRandomD = 0;
         var gallery=document.getElementById("gallery");
+        if(gallery.offsetWidth < 600){
+          scale = 1.2;
+        }
         var initWidth = dataSize[item.id].width;
         var initHeight = dataSize[item.id].height;
-
         var newWidth = (initWidth * scale);
         var newHeight = initHeight * (newWidth / initWidth);
-
         var x = (gallery.offsetWidth - newWidth) / 2;
         var y = (gallery.offsetHeight - navbarHeight - newHeight) / 2;
+
         item.style.transformOrigin = '0 0';
         item.style.WebkitTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
         item.style.msTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
@@ -121,7 +124,11 @@ var polaroidGallery = (function () {
     }
 
     function shuffle(item, zIndex) {
+        var minS=1;
         var gallery=document.getElementById("gallery");
+        if(gallery.offsetWidth < 600){
+          minS = 0.7;
+        }
         var randomX = Math.random();
         var randomY = Math.random();
         var maxR = 45;
@@ -129,16 +136,15 @@ var polaroidGallery = (function () {
         var rotRandomD = Math.random() * (maxR - minR) + minR;
         var rotRandomR = rotRandomD * Math.PI / 180;
 
-        var rotatedW = Math.abs(item.offsetWidth * Math.cos(rotRandomR)) + Math.abs(item.offsetHeight * Math.sin(rotRandomR));
-        var rotatedH = Math.abs(item.offsetWidth * Math.sin(rotRandomR)) + Math.abs(item.offsetHeight * Math.cos(rotRandomR));
+        var rotatedW = Math.abs(item.offsetWidth * minS * Math.cos(rotRandomR)) + Math.abs(item.offsetHeight * minS * Math.sin(rotRandomR));
+        var rotatedH = Math.abs(item.offsetWidth * minS * Math.sin(rotRandomR)) + Math.abs(item.offsetHeight * minS * Math.cos(rotRandomR));
 
         var x = Math.floor((gallery.offsetWidth - rotatedW) * randomX);
         var y = Math.floor((gallery.offsetHeight - rotatedH) * randomY);
-        console.log(x)
         item.style.transformOrigin = '0 0';
-        item.style.WebkitTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(1)';
-        item.style.msTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(1)';
-        item.style.transform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(1)';
+        item.style.WebkitTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + minS + ',' + minS + ')';
+        item.style.msTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + minS + ',' + minS + ')';
+        item.style.transform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + minS + ',' + minS + ')';
         item.style.zIndex = zIndex;
     }
 
