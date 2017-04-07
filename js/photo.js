@@ -112,8 +112,8 @@ var polaroidGallery = (function () {
         var newWidth = (initWidth * scale);
         var newHeight = initHeight * (newWidth / initWidth);
         var x = (gallery.offsetWidth - newWidth) / 2;
-        var y = (gallery.offsetHeight - navbarHeight - newHeight) / 2;
-
+        var y = (gallery.offsetHeight - newHeight) / 2;
+        console.log(y)
         item.style.transformOrigin = '0 0';
         item.style.WebkitTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
         item.style.msTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
@@ -139,7 +139,7 @@ var polaroidGallery = (function () {
         var rotatedW = Math.abs(item.offsetWidth * minS * Math.cos(rotRandomR)) + Math.abs(item.offsetHeight * minS * Math.sin(rotRandomR));
         var rotatedH = Math.abs(item.offsetWidth * minS * Math.sin(rotRandomR)) + Math.abs(item.offsetHeight * minS * Math.cos(rotRandomR));
 
-        var x = Math.floor((gallery.offsetWidth - rotatedW) * randomX);
+        var x = Math.floor((gallery.offsetWidth - rotatedW/2) * randomX);
         var y = Math.floor((gallery.offsetHeight - rotatedH) * randomY);
         item.style.transformOrigin = '0 0';
         item.style.WebkitTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + minS + ',' + minS + ')';
