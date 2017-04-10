@@ -7,7 +7,8 @@ var polaroidGallery = (function() {
   var xmlhttp = new XMLHttpRequest();
   var url = "output.json";
   var mode = true;
-  var galleryH;
+  var galleryH = window.innerHeight * 0.9;;
+
   function polaroidGallery() {
     observe();
     xmlhttp.onreadystatechange = function() {
@@ -92,6 +93,11 @@ var polaroidGallery = (function() {
 
   function init() {
     navbarHeight = document.getElementById("nav").offsetHeight;
+    var gallery = document.getElementById("gallery");
+    if (gallery.offsetWidth < 600) {
+      galleryH = window.innerHeight * 0.75;
+    }
+    gallery.style.height = galleryH + 'px';
     navigation();
 
     window.addEventListener('resize', function() {
@@ -116,12 +122,12 @@ var polaroidGallery = (function() {
     var scale = 1.6;
     var rotRandomD = 0;
     var gallery = document.getElementById("gallery");
-    galleryH=window.innerHeight*0.9;
+    galleryH = window.innerHeight * 0.9;
     if (gallery.offsetWidth < 600) {
-        scale = 1.2;
-
+      scale = 1.2;
+      galleryH = window.innerHeight * 0.75;
     }
-    gallery.style.height= galleryH+'px';
+    gallery.style.height = galleryH + 'px';
     var initWidth = dataSize[item.id].width;
     var initHeight = dataSize[item.id].height;
     var newWidth = (initWidth * scale);
@@ -196,7 +202,7 @@ var polaroidGallery = (function() {
       dataSize[i].item.style.WebkitTransform = 'translate(' + x * itemW + 'px,' + oArr[x] * scale + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
       dataSize[i].item.style.msTransform = 'translate(' + x * itemW + 'px,' + oArr[x] * scale + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
       dataSize[i].item.style.transform = 'translate(' + x * itemW + 'px,' + oArr[x] * scale + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
-      oArr[x]+= dataSize[i].item.offsetHeight;
+      oArr[x] += dataSize[i].item.offsetHeight;
 
     }
     gallery.style.height = Math.max.apply(null, oArr) * scale + 'px';
