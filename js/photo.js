@@ -7,7 +7,7 @@ var polaroidGallery = (function() {
   var xmlhttp = new XMLHttpRequest();
   var url = "output.json";
   var mode = true;
-
+  var galleryH;
   function polaroidGallery() {
     observe();
     xmlhttp.onreadystatechange = function() {
@@ -113,20 +113,21 @@ var polaroidGallery = (function() {
   }
 
   function select(item) {
-
     var scale = 1.6;
     var rotRandomD = 0;
     var gallery = document.getElementById("gallery");
-    gallery.style.height = window.innerHeight * 0.8 + 'px';
+    galleryH=window.innerHeight*0.9;
     if (gallery.offsetWidth < 600) {
-      scale = 1.2;
+        scale = 1.2;
+
     }
+    gallery.style.height= galleryH+'px';
     var initWidth = dataSize[item.id].width;
     var initHeight = dataSize[item.id].height;
     var newWidth = (initWidth * scale);
     var newHeight = initHeight * (newWidth / initWidth);
     var x = (gallery.offsetWidth - newWidth) / 2;
-    var y = (gallery.offsetHeight - newHeight) / 2;
+    var y = (galleryH - newHeight) / 2;
     item.style.transformOrigin = '0 0';
     item.style.WebkitTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
     item.style.msTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
@@ -134,6 +135,7 @@ var polaroidGallery = (function() {
     item.style.zIndex = 999;
     var mode = true;
     currentItem = item;
+
   }
 
   function shuffle(item, zIndex) {
@@ -153,7 +155,7 @@ var polaroidGallery = (function() {
     var rotatedH = Math.abs(item.offsetWidth * minS * Math.sin(rotRandomR)) + Math.abs(item.offsetHeight * minS * Math.cos(rotRandomR));
 
     var x = Math.floor((gallery.offsetWidth - rotatedW / 2) * randomX);
-    var y = Math.floor((gallery.offsetHeight - rotatedH) * randomY);
+    var y = Math.floor((galleryH - rotatedH) * randomY);
     item.style.transformOrigin = '0 0';
     item.style.WebkitTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + minS + ',' + minS + ')';
     item.style.msTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + minS + ',' + minS + ')';

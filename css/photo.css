@@ -13,7 +13,6 @@ body {
     -moz-transition: height .5s;
     -webkit-transition: height .5s;
     -o-transition: height .5s;
-    min-height: 580px;
     padding: 0;
     position: relative;
     z-index: 1;
