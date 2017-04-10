@@ -9,9 +9,14 @@ body {
     height: 100%;
     overflow: hidden;
     margin: 0;
+    transition: height .5s;
+    -moz-transition: height .5s;
+    -webkit-transition: height .5s;
+    -o-transition: height .5s;
     min-height: 580px;
     padding: 0;
     position: relative;
+    z-index: 1;
 }
 
 figure {
@@ -65,9 +70,6 @@ button:hover {
     color: white;
 }
 @media screen and (max-width:600px){
-  .fullscreen {
-    min-height: 460px;
-  }
   .navbar{
     padding: 5px;
   }

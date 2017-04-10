@@ -1,239 +1,250 @@
-var polaroidGallery = (function () {
-    var dataSize = {};
-    var dataLength = 0;
-    var currentItem = null;
-    var navbarHeight = 60;
-    var resizeTimeout = null;
-    var xmlhttp = new XMLHttpRequest();
-    var url = "output.json";
+var polaroidGallery = (function() {
+  var dataSize = {};
+  var dataLength = 0;
+  var currentItem = null;
+  var navbarHeight = 60;
+  var resizeTimeout = null;
+  var xmlhttp = new XMLHttpRequest();
+  var url = "output.json";
+  var mode = true;
+
+  function polaroidGallery() {
+    observe();
+    xmlhttp.onreadystatechange = function() {
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        var myArr = JSON.parse(xmlhttp.responseText);
+        setGallery(myArr);
+
+        init();
+      }
+    };
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
+  }
+
+  function setGallery(arr) {
+    var out = "";
+    var i;
+    var caption = [];
+
+    for (i = 0; i < arr.length; i++) {
+      caption[i] = arr[i].match(/(\S*)(.jpg|.png|.JPG|.PNG)/)[1];
+      out += '<figure id="' + i + '">' +
+        '<img src="https://raw.githubusercontent.com/satin520/satin520.github.io/master/album/' + arr[i] + '"/>' +
+        '<figcaption>' + caption[i] + '</figcaption>' +
+        '</figure>';
+    }
+    document.getElementById("gallery").innerHTML = out;
+  }
+
+  function observe() {
+    var observeDOM = (function() {
+      var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
+        eventListenerSupported = window.addEventListener;
+
+      return function(obj, callback) {
+        if (MutationObserver) {
+          var obs = new MutationObserver(function(mutations, observer) {
+            if (mutations[0].addedNodes.length || mutations[0].removedNodes.length)
+              callback(mutations);
+          });
+
+          obs.observe(obj, {
+            childList: true,
+            subtree: false
+          });
+        } else if (eventListenerSupported) {
+          obj.addEventListener('DOMNodeInserted', callback, false);
+        }
+      }
+    })();
+
+    observeDOM(document.getElementById('gallery'), function(mutations) {
+      var gallery = [].slice.call(mutations[0].addedNodes);
+      var zIndex = 1;
+      gallery.forEach(function(item) {
+        var img = item.getElementsByTagName('img')[0];
+        var first = true;
+        img.addEventListener('load', function() {
+          if (first) {
+            currentItem = item;
+            first = false;
+          }
+          dataSize[item.id] = {
+            item: item,
+            width: item.offsetWidth,
+            height: item.offsetHeight
+          };
+
+          dataLength++;
+
+          item.addEventListener('click', function() {
+            mode = true;
+            select(item);
+            shuffleAll();
+          });
+
+          shuffle(item, zIndex++);
+        })
+      });
+    });
+  }
+
+  function init() {
+    navbarHeight = document.getElementById("nav").offsetHeight;
+    navigation();
+
+    window.addEventListener('resize', function() {
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
+      resizeTimeout = setTimeout(function() {
+        if (mode) {
+          shuffleAll();
+          if (currentItem) {
+            select(currentItem);
+          }
+        } else {
+          listMode();
+        }
+
+      }, 200);
+    });
+  }
+
+  function select(item) {
+
+    var scale = 1.6;
+    var rotRandomD = 0;
+    var gallery = document.getElementById("gallery");
+    gallery.style.height = window.innerHeight * 0.8 + 'px';
+    if (gallery.offsetWidth < 600) {
+      scale = 1.2;
+    }
+    var initWidth = dataSize[item.id].width;
+    var initHeight = dataSize[item.id].height;
+    var newWidth = (initWidth * scale);
+    var newHeight = initHeight * (newWidth / initWidth);
+    var x = (gallery.offsetWidth - newWidth) / 2;
+    var y = (gallery.offsetHeight - newHeight) / 2;
+    item.style.transformOrigin = '0 0';
+    item.style.WebkitTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
+    item.style.msTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
+    item.style.transform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
+    item.style.zIndex = 999;
     var mode = true;
-    function polaroidGallery() {
-        observe();
-        xmlhttp.onreadystatechange = function () {
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                var myArr = JSON.parse(xmlhttp.responseText);
-                setGallery(myArr);
+    currentItem = item;
+  }
 
-                init();
-            }
-        };
-        xmlhttp.open("GET", url, true);
-        xmlhttp.send();
+  function shuffle(item, zIndex) {
+    var minS = 1;
+    var gallery = document.getElementById("gallery");
+    if (gallery.offsetWidth < 600) {
+      minS = 0.7;
     }
+    var randomX = Math.random();
+    var randomY = Math.random();
+    var maxR = 45;
+    var minR = -45;
+    var rotRandomD = Math.random() * (maxR - minR) + minR;
+    var rotRandomR = rotRandomD * Math.PI / 180;
 
-    function setGallery(arr) {
-        var out = "";
-        var i;
-        var caption=[];
+    var rotatedW = Math.abs(item.offsetWidth * minS * Math.cos(rotRandomR)) + Math.abs(item.offsetHeight * minS * Math.sin(rotRandomR));
+    var rotatedH = Math.abs(item.offsetWidth * minS * Math.sin(rotRandomR)) + Math.abs(item.offsetHeight * minS * Math.cos(rotRandomR));
 
-        for (i = 0; i < arr.length; i++) {
-            caption[i]=arr[i].match(/(\S*)(.jpg|.png|.JPG|.PNG)/)[1];
-            out += '<figure id="' + i + '">' +
-                '<img src="https://raw.githubusercontent.com/satin520/satin520.github.io/master/album/' + arr[i] + '"/>' +
-                '<figcaption>' + caption[i] + '</figcaption>' +
-                '</figure>';
-        }
-        document.getElementById("gallery").innerHTML = out;
-    }
+    var x = Math.floor((gallery.offsetWidth - rotatedW / 2) * randomX);
+    var y = Math.floor((gallery.offsetHeight - rotatedH) * randomY);
+    item.style.transformOrigin = '0 0';
+    item.style.WebkitTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + minS + ',' + minS + ')';
+    item.style.msTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + minS + ',' + minS + ')';
+    item.style.transform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + minS + ',' + minS + ')';
+    item.style.zIndex = zIndex;
 
-    function observe() {
-        var observeDOM = (function () {
-            var MutationObserver = window.MutationObserver || window.WebKitMutationObserver,
-                eventListenerSupported = window.addEventListener;
+  }
 
-            return function (obj, callback) {
-                if (MutationObserver) {
-                    var obs = new MutationObserver(function (mutations, observer) {
-                        if( mutations[0].addedNodes.length || mutations[0].removedNodes.length )
-                        callback(mutations);
-                    });
-
-                    obs.observe(obj, { childList: true, subtree: false });
-                }
-                else if (eventListenerSupported) {
-                    obj.addEventListener('DOMNodeInserted', callback, false);
-                }
-            }
-        })();
-
-        observeDOM(document.getElementById('gallery'), function (mutations) {
-            var gallery = [].slice.call(mutations[0].addedNodes);
-            var zIndex = 1;
-            gallery.forEach(function (item) {
-                var img = item.getElementsByTagName('img')[0];
-                var first = true;
-                img.addEventListener('load', function () {
-                    if (first) {
-                        currentItem = item;
-                        first = false;
-                    }
-                    dataSize[item.id] = {item: item, width: item.offsetWidth, height: item.offsetHeight};
-
-                    dataLength++;
-
-                    item.addEventListener('click', function () {
-                        mode=true;
-                        select(item);
-                        shuffleAll();
-                    });
-
-                    shuffle(item, zIndex++);
-                })
-            });
-        });
-    }
-
-    function init() {
-        navbarHeight = document.getElementById("nav").offsetHeight;
-        navigation();
-
-        window.addEventListener('resize', function () {
-            if (resizeTimeout) {
-                clearTimeout(resizeTimeout);
-            }
-            resizeTimeout = setTimeout(function () {
-                if(mode){
-                  shuffleAll();
-                  if (currentItem) {
-                      select(currentItem);
-                  }
-                }
-                else{
-                  listmode();
-                }
-
-            }, 100);
-        });
-    }
-
-    function select(item) {
-
-        var scale = 1.6;
-        var rotRandomD = 0;
-        var gallery=document.getElementById("gallery");
-        if(gallery.offsetWidth < 600){
-          scale = 1.2;
-        }
-        var initWidth = dataSize[item.id].width;
-        var initHeight = dataSize[item.id].height;
-        var newWidth = (initWidth * scale);
-        var newHeight = initHeight * (newWidth / initWidth);
-        var x = (gallery.offsetWidth - newWidth) / 2;
-        var y = (gallery.offsetHeight - newHeight) / 2;
-        item.style.transformOrigin = '0 0';
-        item.style.WebkitTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
-        item.style.msTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
-        item.style.transform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + scale + ',' + scale + ')';
-        item.style.zIndex = 999;
-        var mode = true;
-        currentItem = item;
-    }
-
-    function shuffle(item, zIndex) {
-        var minS=1;
-        var gallery=document.getElementById("gallery");
-        if(gallery.offsetWidth < 600){
-          minS = 0.7;
-        }
-        var randomX = Math.random();
-        var randomY = Math.random();
-        var maxR = 45;
-        var minR = -45;
-        var rotRandomD = Math.random() * (maxR - minR) + minR;
-        var rotRandomR = rotRandomD * Math.PI / 180;
-
-        var rotatedW = Math.abs(item.offsetWidth * minS * Math.cos(rotRandomR)) + Math.abs(item.offsetHeight * minS * Math.sin(rotRandomR));
-        var rotatedH = Math.abs(item.offsetWidth * minS * Math.sin(rotRandomR)) + Math.abs(item.offsetHeight * minS * Math.cos(rotRandomR));
-
-        var x = Math.floor((gallery.offsetWidth - rotatedW/2) * randomX);
-        var y = Math.floor((gallery.offsetHeight - rotatedH) * randomY);
-        item.style.transformOrigin = '0 0';
-        item.style.WebkitTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + minS + ',' + minS + ')';
-        item.style.msTransform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + minS + ',' + minS + ')';
-        item.style.transform = 'translate(' + x + 'px,' + y + 'px) rotate(' + rotRandomD + 'deg) scale(' + minS + ',' + minS + ')';
-        item.style.zIndex = zIndex;
-
-    }
-
-    function shuffleAll() {
-        var zIndex = 0;
-        for (var id in dataSize) {
-            if (id != currentItem.id) {
-                shuffle(dataSize[id].item, zIndex++);
-            }
-        }
-
-    }
-    function listmode(){
-      var colSzie=5;
-      var gallery=document.getElementById("gallery");
-      var figure=gallery.getElementsByTagName('figure');
-      var itemW=gallery.offsetWidth/colSzie;
-      var scale=itemW/figure[0].offsetWidth;
-      console.log(scale)
-      var oArr = [];
-      // for (var id in dataSize) {
-      //   dataSize[id].item.style.width=itemW + "px";
-      // }
-      for(var i=0;i<colSzie;i++){
-        dataSize[i].item.style.WebkitTransform = 'translate(' + i*itemW + 'px,' + 0 + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
-        dataSize[i].item.style.msTransform = 'translate(' + i*itemW + 'px,' + 0 + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
-        dataSize[i].item.style.transform = 'translate(' + i*itemW + 'px,' + 0 + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
-        oArr.push(dataSize[i].item.offsetHeight*scale)
+  function shuffleAll() {
+    var zIndex = 0;
+    for (var id in dataSize) {
+      if (id != currentItem.id) {
+        shuffle(dataSize[id].item, zIndex++);
       }
-      for(var i=colSzie;i<figure.length;i++){
-        var x = _getMinKey(oArr);
-        dataSize[i].item.style.WebkitTransform = 'translate(' + x*itemW + 'px,' + oArr[x] + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
-        dataSize[i].item.style.msTransform = 'translate(' + x*itemW + 'px,' + oArr[x] + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
-        dataSize[i].item.style.transform = 'translate(' + x*itemW + 'px,' + oArr[x] + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
-        oArr[x]+=dataSize[i].item.offsetHeight;
-      }
+    }
 
+  }
 
+  function listMode() {
+    var colSzie = 5;
+    var gallery = document.getElementById('gallery');
+    var figure = gallery.getElementsByTagName('figure');
+    if (gallery.offsetWidth < 600) {
+      colSzie = 3;
+    }
+    var itemW = gallery.offsetWidth / colSzie;
+    console.log(itemW)
+    var scale = itemW / figure[0].offsetWidth;
+    var oArr = [];
+    for (var i = 0; i < colSzie; i++) {
+      dataSize[i].item.style.WebkitTransform = 'translate(' + i * itemW + 'px,' + 0 + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
+      dataSize[i].item.style.msTransform = 'translate(' + i * itemW + 'px,' + 0 + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
+      dataSize[i].item.style.transform = 'translate(' + i * itemW + 'px,' + 0 + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
+      oArr.push(dataSize[i].item.offsetHeight)
+    }
+    for (var i = colSzie; i < figure.length; i++) {
+      var x = _getMinKey(oArr);
+      dataSize[i].item.style.WebkitTransform = 'translate(' + x * itemW + 'px,' + oArr[x] * scale + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
+      dataSize[i].item.style.msTransform = 'translate(' + x * itemW + 'px,' + oArr[x] * scale + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
+      dataSize[i].item.style.transform = 'translate(' + x * itemW + 'px,' + oArr[x] * scale + 'px) rotate(' + 0 + 'deg) scale(' + scale + ',' + scale + ')';
+      oArr[x]+= dataSize[i].item.offsetHeight;
 
     }
-    function _getMinKey(arr) {
-      var a = arr[0];
-      var b = 0;
-      for (var k in arr) {
-        if (arr[k] < a) {
+    gallery.style.height = Math.max.apply(null, oArr) * scale + 'px';
+  }
+
+  function _getMinKey(arr) {
+    var a = arr[0];
+    var b = 0;
+    for (var k in arr) {
+      if (arr[k] < a) {
         a = arr[k];
         b = k;
-        }
       }
-      return b;
     }
-    function navigation() {
-        var next = document.getElementById('next');
-        var preview = document.getElementById('preview');
-        var list = document.getElementById('list');
+    return b;
+  }
 
-        list.addEventListener('click', function () {
-          mode=false;
-          listmode();
-        });
+  function navigation() {
+    var next = document.getElementById('next');
+    var preview = document.getElementById('preview');
+    var list = document.getElementById('list');
 
-        next.addEventListener('click', function () {
-            mode=true;
-            var currentIndex = Number(currentItem.id) + 1;
-            if (currentIndex >= dataLength) {
-                currentIndex = 0
-            }
-            select(dataSize[currentIndex].item);
-            shuffleAll();
-        });
+    list.addEventListener('click', function() {
+      mode = false;
+      listMode();
+    });
 
-        preview.addEventListener('click', function () {
-            mode=true;
-            var currentIndex = Number(currentItem.id) - 1;
-            if (currentIndex < 0) {
-                currentIndex = dataLength - 1
-            }
-            select(dataSize[currentIndex].item);
-            shuffleAll();
-        })
-    }
+    next.addEventListener('click', function() {
+      mode = true;
+      var currentIndex = Number(currentItem.id) + 1;
+      if (currentIndex >= dataLength) {
+        currentIndex = 0
+      }
+      select(dataSize[currentIndex].item);
+      shuffleAll();
+    });
 
-    return polaroidGallery;
+    preview.addEventListener('click', function() {
+      mode = true;
+      var currentIndex = Number(currentItem.id) - 1;
+      if (currentIndex < 0) {
+        currentIndex = dataLength - 1
+      }
+      select(dataSize[currentIndex].item);
+      shuffleAll();
+    })
+  }
+
+  return polaroidGallery;
 })();
-window.onload = function () {new polaroidGallery("output.json");}
+window.onload = function() {
+  new polaroidGallery("output.json");
+}
